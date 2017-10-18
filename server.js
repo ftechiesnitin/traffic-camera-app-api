@@ -4,6 +4,7 @@ const app = express();
 const http = require('http');
 const bodyParser = require('body-parser');
 const compression = require('compression');
+const mongoose = require('mongoose');
 // Helmet helps you secure your Express apps by setting various HTTP headers
 const helmet = require('helmet');
 // This package protects against HTTP Parameter Pollution attacks
@@ -11,6 +12,12 @@ const hpp = require('hpp');
 
 // Get configuration
 const cfg = require('./config.js');
+
+mongoose.connect(cfg.db.host + '/' + cfg.db.dbName);
+mongoose.connection.on('error', function() {
+  console.log('MongoDB Connection Error. Please make sure that MongoDB is running.');
+  process.exit(1);
+});
 
 app.use(helmet());
 // compress all requests response in GZIP
@@ -27,9 +34,9 @@ app.use(bodyParser.json({ limit: '50mb', extended: true, type:'application/json'
 app.use(bodyParser.json({ type: 'application/*+json' }));
 app.use(hpp());
 
-app.get('/api', (req, res) => {
-  res.jsonp({hey: 'hello'});
-});
+const traffic = require('./api/traffic');
+
+app.get('/api/traffic/images', traffic.getImagesFromDb);
 
 /**
  * Create HTTP server.
@@ -45,7 +52,6 @@ server.on('listening', onListening);
 /**
  * Normalize a port into a number, string, or false.
  */
-
 function normalizePort(val) {
   var port = parseInt(val, 10);
 
@@ -54,11 +60,9 @@ function normalizePort(val) {
 
   return false;
 }
-
 /**
  * Event listener for HTTP server "error" event.
  */
-
 function onError(error) {
   if (error.syscall !== 'listen') throw error;
 
@@ -77,7 +81,6 @@ function onError(error) {
       throw error;
   }
 }
-
 /**
  * Event listener for HTTP server "listening" event.
  */
@@ -86,3 +89,5 @@ function onListening() {
   var bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port;
   console.log('Listening on: ' + bind);
 }
+
+require('./job/trafficImagesJob')();

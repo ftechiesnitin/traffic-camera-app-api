@@ -4,7 +4,8 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js",
+    "test": "mocha"
   },
   "repository": {
     "type": "git",
@@ -17,11 +18,15 @@
   },
   "homepage": "https://github.com/ftechiesnitin/traffic-camera-app-api#readme",
   "dependencies": {
+    "async": "^2.5.0",
     "body-parser": "^1.18.2",
     "compression": "^1.7.1",
     "express": "^4.16.2",
     "helmet": "^3.9.0",
     "hpp": "^0.2.2",
+    "mongoose": "^4.12.3",
+    "request": "^2.83.0",
+    "supertest": "^3.0.0",
     "use-strict": "^1.0.1"
   }
 }
